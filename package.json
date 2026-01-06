@@ -1,0 +1,37 @@
+{
+  "name": "payroute-x402-sdk",
+  "version": "0.0.1",
+  "description": "SDK for automation payment gateway with x402",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/payroute-protocol/payroute-x402-sdk.git"
+  },
+  "keywords": [
+    "x402",
+    "payroute",
+    "payment",
+    "gateway",
+    "sdk"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/payroute-protocol/payroute-x402-sdk/issues"
+  },
+  "homepage": "https://github.com/payroute-protocol/payroute-x402-sdk#readme",
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "dependencies": {
+    "ethers": "^6.16.0"
+  }
+}
