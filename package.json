@@ -1,6 +1,6 @@
 {
   "name": "@payroute/x402-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SDK for automation payment gateway with x402",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
