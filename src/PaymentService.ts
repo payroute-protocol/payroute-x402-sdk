@@ -15,6 +15,7 @@ export interface PaymentServiceConfig {
   privateKey: string;
   network?: 'mantle' | 'mantleTestnet' | 'localhost';
   rpcUrl?: string; // Allow custom RPC URL override
+  apiBaseUrl?: string; // Allow custom API Base URL
 }
 
 /**
@@ -38,8 +39,6 @@ const NETWORKS = {
   }
 };
 
-// const BASE_ENDPOINT = 'https://x402-services.vercel.app';
-const BASE_ENDPOINT = 'http://localhost:3000';
 const ESCROW_ABI = [
   "function createTx(bytes32 txId, address creator, uint256 amount)",
 ];
@@ -57,6 +56,7 @@ const ERC20_ABI = [
 export class PaymentService {
   private wallet: ethers.Wallet;
   private provider: ethers.JsonRpcProvider;
+  private apiBaseUrl: string;
 
   constructor(config: PaymentServiceConfig) {
     const networkKey = config.network || 'mantle';
@@ -77,6 +77,8 @@ export class PaymentService {
     } catch (error) {
       throw new Error('Invalid private key provided.');
     }
+
+    this.apiBaseUrl = config.apiBaseUrl || 'https://x402-services.vercel.app';
   }
 
   /**
@@ -143,7 +145,7 @@ export class PaymentService {
    */
   async generateAIResponse<T = any>(agentSlug: string, message: string): Promise<T> {
     try {
-      const initialResponse = await fetch(`${BASE_ENDPOINT}/agent/${agentSlug}/chat`, {
+      const initialResponse = await fetch(`${this.apiBaseUrl}/agent/${agentSlug}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -199,7 +201,7 @@ export class PaymentService {
 
       console.log(`Retry with txHash: ${finalTxHash}`);
 
-      const retryResponse = await fetch(`${BASE_ENDPOINT}/agent/${agentSlug}/chat`, {
+      const retryResponse = await fetch(`${this.apiBaseUrl}/agent/${agentSlug}/chat`, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
@@ -229,7 +231,7 @@ export class PaymentService {
    */
   async generateAIResponseEscrow<T = any>(agentSlug: string, message: string): Promise<T> {
     try {
-      const initialResponse = await fetch(`${BASE_ENDPOINT}/agent/escrow/${agentSlug}/chat`, {
+      const initialResponse = await fetch(`${this.apiBaseUrl}/agent/escrow/${agentSlug}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -295,7 +297,7 @@ export class PaymentService {
 
       console.log(`Retry with txHash: ${finalTxHash}`);
 
-      const retryResponse = await fetch(`${BASE_ENDPOINT}/agent/escrow/${agentSlug}/chat`, {
+      const retryResponse = await fetch(`${this.apiBaseUrl}/agent/escrow/${agentSlug}/chat`, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
@@ -329,7 +331,7 @@ export class PaymentService {
       let initialResponse;
 
       try{
-        initialResponse = await fetch(`${BASE_ENDPOINT}/${gatewaySlug}`);
+        initialResponse = await fetch(`${this.apiBaseUrl}/${gatewaySlug}`);
       } catch (e){
         throw new Error(`Initial Endpoint Failed: ${e}`);
       }
@@ -387,7 +389,7 @@ export class PaymentService {
 
       console.log("view header: ", headers)
 
-      const retryResponse = await fetch(`${BASE_ENDPOINT}/${gatewaySlug}`, {
+      const retryResponse = await fetch(`${this.apiBaseUrl}/${gatewaySlug}`, {
           method: 'GET',
           headers: headers
       });
@@ -417,7 +419,7 @@ export class PaymentService {
       let initialResponse;
 
       try{
-        initialResponse = await fetch(`${BASE_ENDPOINT}/escrow/${gatewaySlug}`);
+        initialResponse = await fetch(`${this.apiBaseUrl}/escrow/${gatewaySlug}`);
       } catch (e){
         throw new Error(`Initial Endpoint Failed: ${e}`);
       }
@@ -485,7 +487,7 @@ export class PaymentService {
 
       console.log("view header: ", headers)
 
-      const retryResponse = await fetch(`${BASE_ENDPOINT}/escrow/${gatewaySlug}`, {
+      const retryResponse = await fetch(`${this.apiBaseUrl}/escrow/${gatewaySlug}`, {
           method: 'GET',
           headers: headers
       });

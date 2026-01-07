@@ -15,10 +15,8 @@ This SDK abstracts the complexity of **HTTP 402 Pay-Per-Hit** workflows, enablin
 ## Installation
 
 ```bash
-npm install @payroute/x402-sdk ethers
+npm install @payroute/x402-sdk
 ```
-
-_Note: `ethers` peer dependency (v6) is required._
 
 ## Quick Start
 
@@ -43,7 +41,7 @@ Use this method for direct peer-to-peer payments to a receiver.
 
 ```typescript
 try {
-  const content = await service.getProxyEndpoint("test09");
+  const content = await service.getProxyEndpoint("MantleDocs");
   console.log("Accessed Content:", content);
 } catch (error) {
   console.error("Payment or Fetch Failed:", error);
@@ -56,7 +54,7 @@ Use this method when the gateway requires payment via an escrow smart contract.
 
 ```typescript
 try {
-  const contentStart = await service.getProxyEndpointEscrow("test09");
+  const contentStart = await service.getProxyEndpointEscrow("BitcoinOutlook");
   console.log("Accessed Escrow Content:", contentStart);
 } catch (error) {
   console.error("Payment or Fetch Failed:", error);
@@ -71,7 +69,10 @@ Send messages to an AI agent that requires per-message payments.
 
 ```typescript
 try {
-  const response = await service.generateAIResponse("agentTest1", "Hello");
+  const response = await service.generateAIResponse(
+    "mantleAgent",
+    "How to build smart contract on Mantle Network?"
+  );
   console.log("AI Response:", response);
 } catch (error) {
   console.error("Agent Interaction Failed:", error);
@@ -83,8 +84,8 @@ try {
 ```typescript
 try {
   const responseEscrow = await service.generateAIResponseEscrow(
-    "agentTest1",
-    "Hello"
+    "mantleAgent",
+    "How to build AVS on EigenLayer?"
   );
   console.log("AI Response Escrow:", responseEscrow);
 } catch (error) {
@@ -103,6 +104,75 @@ const service = new PaymentService({
   privateKey: "...",
   rpcUrl: "https://rpc.ankr.com/mantle",
 });
+```
+
+## Integration with AI Agents & LLMs
+
+One of the most powerful use cases for `@payroute/x402-sdk` is enabling **Autonomous Economic Agents**. Because the SDK handles the entire payment lifecycle programmatically, LLMs can "pay" for their own resources without user intervention.
+
+### Example: Autonomous Research Agent
+
+Imagine an AI agent tasked with gathering premium market data. It can use this SDK to automatically pay for each data point it accesses using its own wallet.
+
+```typescript
+import { PaymentService } from "@payroute/x402-sdk";
+import { openai } from "./my-llm-setup"; // Hypothetical LLM client
+
+// 1. Give the Agent a Wallet
+const agentWalletKey = process.env.AGENT_PRIVATE_KEY;
+const payroute = new PaymentService({
+  privateKey: agentWalletKey,
+  network: "mantle",
+});
+
+async function autonomousResearchTask(topic: string) {
+  console.log(`Agent starting research on: ${topic}...`);
+
+  // 2. Agent decides it needs premium data (e.g., from 'HighValueData' endpoint)
+  // The SDK handles the 402 challenge, approves tokens, pays, and returns the data.
+  console.log("Accessing premium data source...");
+
+  // THIS SINGLE LINE handles the entire negotiation and payment
+  const premiumData = await payroute.getProxyEndpointEscrow("HighValueData");
+
+  // 3. Agent processes the purchased data
+  console.log("Data acquired. Analyzing...");
+  const analysis = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "user",
+        content: `Analyze this data: ${JSON.stringify(premiumData)}`,
+      },
+    ],
+  });
+
+  return analysis.choices[0].message.content;
+}
+```
+
+This pattern transforms **passive tools** into **economically active agents** capable of trading value for information or services on the open market.
+
+### Example: Agent-to-Agent Consultation
+
+Your agent can also pay to converse with other specialized AI agents (e.g., a "Legal Expert" or "Medical Advisor").
+
+```typescript
+async function consultExpertAgent(problem: string) {
+  // Agent identifies it needs help from a specific expert agent slug
+  const expertAgentSlug = "legal-expert-v1";
+
+  console.log(`Consulting ${expertAgentSlug}...`);
+
+  // The SDK handles payment for the conversation turn
+  const expertAdvice = await payroute.generateAIResponseEscrow(
+    expertAgentSlug,
+    `I have a user asking about: ${problem}. What are the compliance risks?`
+  );
+
+  // Initial Agent integrates the paid advice into its final response
+  return expertAdvice.response;
+}
 ```
 
 ## Architecture
